@@ -12,26 +12,14 @@
           "informationUri": "https://www.glog.ai",
           "rules": [
             {
-              "id": "glog-2dd27f15-e6b5-4af6-9805-4ea9c9e98179",
+              "id": "baedb0f7-821f-39ed-8dd5-cfcaa3a6b721",
               "help": {
                 "text": "",
-                "markdown": "## Description\n\nThe `strcat` function in C++ is used to concatenate strings. However, it is considered unsafe because it does not perform bounds checking, and thus can lead to buffer overflow vulnerabilities. This can potentially allow an attacker to execute arbitrary code or cause a denial of service.\n\nThe specific vulnerability sink in question is `strcat(end, \".0\")`. Here, `strcat` is used to append the string \".0\" to the string `end`. If the buffer `end` is not large enough to hold the additional characters, a buffer overflow will occur.\n\n## Mitigation Advice\n\nTo mitigate this vulnerability, use safer string handling functions that perform bounds checking, such as `strncat`, `strlcat`, or `snprintf`. These functions take an additional parameter specifying the maximum number of characters to be appended, thus preventing buffer overflow.\n\n## Source Code Fix Recommendation\n\nReplace the `strcat` function with `strncat`:\n\n```cpp\nsize_t len = strlen(end);\nstrncat(end, \".0\", sizeof(end) - len - 1);\n```\n\nThis code will append at most `sizeof(end) - len - 1` characters from \".0\" to `end`, thus ensuring that `end` does not overflow.\n\n## Library Dependencies\n\nThe code example requires the `<cstring>` library for the `strcat` function and the `strlen` function.\n\n## References\n\n- [OWASP C++ Secure Coding Practices](https://cheatsheetseries.owasp.org/cheatsheets/C-Based_Toolchain_Hardening_Cheat_Sheet.html)\n- [CWE-676: Use of Potentially Dangerous Function](https://cwe.mitre.org/data/definitions/676.html)\n\nPlease note that the links provided are accessible to anonymous users at the time of writing this report."
+                "markdown": "## Description\n\nThe `strcat` function in C++ is used to concatenate strings. However, it is considered unsafe because it does not perform bounds checking, and thus can lead to buffer overflow vulnerabilities. This can potentially allow an attacker to execute arbitrary code or cause a denial of service.\n\nThe specific vulnerability sink in question is `strcat(end, \".0\")`. Here, `strcat` is used to append the string \".0\" to the string `end`. If the buffer `end` is not large enough to hold the additional characters, a buffer overflow will occur.\n\n## Mitigation Advice\n\nTo mitigate this vulnerability, use safer string handling functions that perform bounds checking, such as `strncat` or `strlcat`. These functions take an additional parameter that specifies the maximum number of characters to be appended, thus preventing buffer overflow.\n\n## Source Code Fix Recommendation\n\nReplace the `strcat` function with `strncat` or `strlcat`. Here is an example using `strncat`:\n\n```cpp\n// Assuming end is a char array with sufficient space\nstrncat(end, \".0\", sizeof(end) - strlen(end) - 1);\n```\n\nThis code will append at most `sizeof(end) - strlen(end) - 1` characters from \".0\" to `end`, thus ensuring that `end` does not overflow.\n\n## Library Dependencies\n\nThe `strcat`, `strncat`, `strlen` functions are part of the C standard library, so you need to include the `cstring` header:\n\n```cpp\n#include <cstring>\n```\n\n## References\n\n- [OWASP C++ Secure Coding Practices](https://cheatsheetseries.owasp.org/cheatsheets/C-Based_Toolchain_Hardening_Cheat_Sheet.html)\n- [CWE-119: Improper Restriction of Operations within the Bounds of a Memory Buffer](https://cwe.mitre.org/data/definitions/119.html)\n\nPlease note that the links provided are accessible to anonymous users at the time of writing this report."
               },
               "properties": {
                 "tags": [
                   "DS141863"
-                ]
-              }
-            },
-            {
-              "id": "glog-64ade17d-3232-4cf1-a888-b47493ef37fd",
-              "help": {
-                "text": "",
-                "markdown": "## Description\n\n\"Detected Prohibited C Function\" vulnerability in C++ refers to the use of certain C standard library functions that are considered unsafe due to their potential to cause buffer overflows, format string vulnerabilities, or other types of security issues. In this case, the function `fprintf` is used, which can lead to format string vulnerabilities if not used carefully.\n\nFormat string vulnerabilities occur when the format string passed to a formatting function contains unsanitized user input. This can allow an attacker to read or write to arbitrary memory locations, or execute arbitrary code.\n\n## Mitigation Advice\n\nTo mitigate this vulnerability, avoid using C standard library functions that do not perform bounds checking or format string checking. Instead, use safer alternatives provided by the C++ standard library, or ensure that all input to these functions is properly sanitized.\n\n## Source Code Fix Recommendation\n\nIn this case, the `fprintf` function is used to print an error message to `stderr`. The format string does not contain any user input, so there is no direct format string vulnerability. However, to avoid potential issues in the future, it is recommended to replace `fprintf` with a safer alternative. Here is a possible fix using `std::cerr`:\n\n```cpp\n#include <iostream>\n\nstd::cerr << \"Error allocating \" << bytes << \" bytes (\" << (bytes >> 30) << \" GB)\\n\";\n```\n\n## Library Dependencies\n\nThe original code requires the following library:\n\n- `stdio.h` for `fprintf` and `stderr`\n\nThe fixed code requires the following library:\n\n- `iostream` for `std::cerr`\n\n## References\n\n- [OWASP C++](https://owasp.org/www-pdf-archive/OWASP_SCP_v2.pdf)\n- [CWE-134: Use of Externally-Controlled Format String](https://cwe.mitre.org/data/definitions/134.html)"
-              },
-              "properties": {
-                "tags": [
-                  "DS154189"
                 ]
               }
             }
@@ -47,11 +35,11 @@
       "language": "en-US",
       "results": [
         {
-          "ruleId": "glog-2dd27f15-e6b5-4af6-9805-4ea9c9e98179",
+          "ruleId": "baedb0f7-821f-39ed-8dd5-cfcaa3a6b721",
           "kind": "fail",
           "level": "error",
           "message": {
-            "text": "\"Detected Use of Prohibited C Function (strcat)\""
+            "text": "Detected Use of Prohibited C Function (strcat)"
           },
           "locations": [
             {
@@ -128,46 +116,6 @@
           ],
           "properties": {
             "DevSkimSeverity": "Important",
-            "DevSkimConfidence": "High",
-            "tags": [
-              "API.DangerousAPI.BannedFunction"
-            ]
-          }
-        },
-        {
-          "ruleId": "glog-64ade17d-3232-4cf1-a888-b47493ef37fd",
-          "kind": "fail",
-          "level": "warning",
-          "message": {
-            "text": "Detected Prohibited C Function"
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "utility.hpp"
-                },
-                "region": {
-                  "startLine": 1251,
-                  "startColumn": 12,
-                  "endLine": 1251,
-                  "endColumn": 19,
-                  "charOffset": 40705,
-                  "charLength": 7,
-                  "snippet": {
-                    "text": "fprintf",
-                    "rendered": {
-                      "text": "fprintf",
-                      "markdown": "`fprintf`"
-                    }
-                  },
-                  "sourceLanguage": "cpp"
-                }
-              }
-            }
-          ],
-          "properties": {
-            "DevSkimSeverity": "Moderate",
             "DevSkimConfidence": "High",
             "tags": [
               "API.DangerousAPI.BannedFunction"
